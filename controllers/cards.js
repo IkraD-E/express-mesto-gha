@@ -1,16 +1,10 @@
-const { default: mongoose } = require("mongoose");
+const Card = require('../models/card');
+const router = require('express').Router();
 
-const cardShema = new mongoose.Shema({
-  name: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
-  },
-  link: {
-    type: String,
-    required: true
-  }
+module.exports.createCard = router.post('/', (req, res) => {
+  const { name, link } = req.body;
+
+  Card.create({ name, link })
+    .then(card => res.send({ data: card }))
+    .catch(err => res.status(500).send({ message: `Произошла ошибка: ${err}`}));
 });
-
-module.exports = mongoose.model('user', userShema);

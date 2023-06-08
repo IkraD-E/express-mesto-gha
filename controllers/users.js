@@ -1,22 +1,21 @@
-const { default: mongoose } = require("mongoose");
+const User = require('../models/user');
 
-const userShema = new mongoose.Shema({
-  name: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
-  },
-  about: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
-  },
-  link: {
-    type: String,
-    required: true
-  }
-});
+module.exports.createUser  = (req, res) => {
+  const { name, about, avatar } = req.body;
+  User.create({ name, about, avatar })
+    .then(user => res.send({ data: user }))
+    .catch(err => res.status(500).send({ message: `Произошла ошибка: ${err}` }));
+};
 
-module.exports = mongoose.model('user', userShema);
+module.exports.getUser = (req, res) => {
+  User.find({})
+    .then(user => res.send({ data: user }))
+    .catch(err => res.status(500).send({ message: `Произошла ошибка: ${err}` }));
+};
+
+
+module.exports.getUserById = (req, res) => {
+  User.findById(req.params.userId)
+    .then(user => res.send({ data: user }))
+    .catch(err => res.status(500).send({ message: `Произошла ошибка: ${err}` }));
+};
