@@ -32,3 +32,8 @@ Nodemon - для перезапуска сервера при обновлени
 
 `npm run start` — запускает сервер   
 `npm run dev` — запускает сервер с hot-reload
+
+
+## Проектная страница
+
+Посмотреть страницу можно перейдя по ссылке: [Github.io](https://ikrad-e.github.io/express-mesto-gha/)
