@@ -30,6 +30,11 @@ app.use(express.json());
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
 
+app.use((req, res) => {
+  res.status(404)
+    .send('Страница не найдена. Ошибка 404');
+});
+
 app.listen(PORT, () => {
   console.log(`Слушаем порт: ${PORT}`);
 });
