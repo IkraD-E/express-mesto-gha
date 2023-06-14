@@ -5,7 +5,7 @@ const routerCards = require('./routes/cards');
 
 const { PORT = 3000 } = process.env;
 
-const BASE_URL = 'mongodb://localhost:27017/mestodb';
+const BASE_URL = 'mongodb://127.0.0.1:27017/mestodb';
 
 const app = express();
 
@@ -20,7 +20,7 @@ mongoose
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '6481641fca75cc32d843385c',
+    _id: '6488a52bc8ad2a77dab0c525',
   };
   next();
 });
@@ -31,8 +31,7 @@ app.use('/users', routerUsers);
 app.use('/cards', routerCards);
 
 app.use((req, res) => {
-  res.status(404)
-    .send('Страница не найдена. Ошибка 404');
+  res.status(404);
 });
 
 app.listen(PORT, () => {
