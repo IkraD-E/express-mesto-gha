@@ -33,7 +33,11 @@ app.use('/users', routerUsers);
 app.use('/cards', routerCards);
 
 app.use((req, res, next) => {
-  res.status(NOT_FOUND).send('Страница не найдена. Ошибка 404');
+  res
+    .status(NOT_FOUND)
+    .send({
+      message: 'Страница не найдена. Ошибка 404',
+    });
   next();
 });
 
