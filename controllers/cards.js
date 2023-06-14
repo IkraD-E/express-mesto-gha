@@ -50,8 +50,17 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail(() => new Error('Not found'))
     .then((card) => res.send(card))
     .catch((err) => {
+      if (err.message === 'Not found') {
+        res
+          .status(NOT_FOUND)
+          .send({
+            message: 'Карточка не существует',
+          });
+        return;
+      }
       if (err.name === 'CastError') {
         res
           .status(BAD_REQUEST_ERR)
@@ -77,8 +86,17 @@ module.exports.addLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => new Error('Not found'))
     .then((card) => res.send(card))
     .catch((err) => {
+      if (err.message === 'Not found') {
+        res
+          .status(NOT_FOUND)
+          .send({
+            message: 'Такая карточка не существует',
+          });
+        return;
+      }
       if (err.name === 'CastError') {
         res
           .status(BAD_REQUEST_ERR)
@@ -104,11 +122,20 @@ module.exports.deleteLike = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => new Error('Not found'))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'Not found') {
         res
           .status(NOT_FOUND)
+          .send({
+            message: 'Карточка не существует',
+          });
+        return;
+      }
+      if (err.name === 'CastError') {
+        res
+          .status(BAD_REQUEST_ERR)
           .send({
             message: 'Карточка не найдена',
           });
