@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://ikrad-e.github.io/express-mesto-gha/",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
     "lint": "npx eslint .",
     "dev": "nodemon app.js"
   },
