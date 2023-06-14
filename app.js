@@ -5,6 +5,8 @@ const routerCards = require('./routes/cards');
 
 const { PORT = 3000 } = process.env;
 
+const NOT_FOUND = 404;
+
 const BASE_URL = 'mongodb://127.0.0.1:27017/mestodb';
 
 const app = express();
@@ -30,8 +32,9 @@ app.use(express.json());
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
 
-app.use((req, res) => {
-  res.status(404);
+app.use((req, res, next) => {
+  res.status(NOT_FOUND).send('Страница не найдена. Ошибка 404');
+  next();
 });
 
 app.listen(PORT, () => {
