@@ -1,22 +1,33 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const userShema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
+    default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
-    required: true,
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+  },
+  email: {
+    type: String,
+    required: [true, 'Введите email'],
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: [true, 'Введите пароль'],
+    select: false,
   },
 });
 
-module.exports = mongoose.model('user', userShema);
+module.exports = mongoose.model('user', userSchema);

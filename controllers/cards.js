@@ -31,6 +31,7 @@ module.exports.createCard = (req, res) => {
     });
   console.log(res.statusCode);
 };
+
 module.exports.getCards = (req, res) => {
   Card.find({})
     .populate(['owner', 'likes'])
@@ -49,6 +50,14 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
+  if (!(req.user._id === Card.findById(req.user._id))) {
+    res
+      .status(NOT_FOUND)
+      .send({
+        message: 'У карточки другой создатель',
+      });
+    return;
+  }
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => new Error('Not found'))
     .then((card) => res.send(card))
