@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const MissiedData = require('../errors/MissiedData');
 
 const BAD_REQUEST_ERR = 400;
 const NOT_FOUND = 404;
@@ -51,12 +52,7 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   if (!(req.user._id === Card.findById(req.user._id))) {
-    res
-      .status(NOT_FOUND)
-      .send({
-        message: 'У карточки другой создатель',
-      });
-    return;
+    throw new MissiedData('У карточки другой создатель');
   }
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => new Error('Not found'))
