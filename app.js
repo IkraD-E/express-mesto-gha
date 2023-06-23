@@ -33,7 +33,9 @@ app.use('/cards', routerCards);
 app.use((req, res, next) => {
   next(new NotFound('Страница не найдена. Где вы взяли на неё ссылку?'));
 });
+
 app.use(errors());
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {

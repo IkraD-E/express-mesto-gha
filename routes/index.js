@@ -8,10 +8,10 @@ const {
 
 router.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
+    email: Joi.string().required().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'ru'] } }),
     password: Joi.string().required().min(8),
     name: Joi.string().required().min(2).max(30),
-    age: Joi.number().integer().required().min(18),
+    avatar: Joi.string().required().min(4),
     about: Joi.string().min(2).max(30),
   }),
 }), createUser);
