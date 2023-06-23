@@ -27,6 +27,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Введите пароль'],
     select: false,
   },
-});
+}, { versionKey: false });
 
 module.exports = mongoose.model('user', userSchema);

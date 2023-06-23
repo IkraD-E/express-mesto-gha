@@ -20,7 +20,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
-    return handleAuthError(res);
+    next(err);
   }
   console.log(payload);
   req.user = payload;

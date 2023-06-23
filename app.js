@@ -3,6 +3,8 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
+const routerIndex = require('./routes/index');
+const errorHandler = require('./middlewares/error');
 
 const { PORT = 3000 } = process.env;
 
@@ -24,8 +26,10 @@ mongoose
 app.use(express.json());
 
 app.use(cookieParser());
+app.use('/', routerIndex);
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
+app.use(errorHandler);
 
 app.use((req, res, next) => {
   res
