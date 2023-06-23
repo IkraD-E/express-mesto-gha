@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFound = require('../errors/NotFound');
+const BadRequest = require('../errors/BadRequest');
 
 const INCORRECT_DATA = 401;
 const MISSED_DATA = 403;
@@ -19,7 +21,7 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .select('+password')
-    .orFail(() => new Error('Not found'))
+    .orFail(() => new NotFound('Not found'))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -69,9 +71,8 @@ module.exports.login = (req, res, next) => {
 
   User.findOne({ email })
     .select('+password')
-    .orFail(() => new Error('Пользователь не найден'))
+    .orFail(() => new BadRequest('Пользователь не найден'))
     .then((user) => {
-      console.log(user);
       bcrypt.compare(String(password), user.password)
         .then((isValidUser) => {
           if (isValidUser) {

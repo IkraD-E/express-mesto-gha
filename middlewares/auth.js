@@ -22,7 +22,6 @@ const auth = (req, res, next) => {
   } catch (err) {
     next(err);
   }
-  console.log(payload);
   req.user = payload;
 
   next();

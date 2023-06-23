@@ -1,14 +1,14 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 const routerIndex = require('./routes/index');
 const errorHandler = require('./middlewares/error');
+const NotFound = require('./errors/NotFound');
 
 const { PORT = 3000 } = process.env;
-
-const NOT_FOUND = 404;
 
 const BASE_URL = 'mongodb://127.0.0.1:27017/mestodb';
 
@@ -29,16 +29,12 @@ app.use(cookieParser());
 app.use('/', routerIndex);
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
-app.use(errorHandler);
 
 app.use((req, res, next) => {
-  res
-    .status(NOT_FOUND)
-    .send({
-      message: 'Страница не найдена. Ошибка 404',
-    });
-  next();
+  next(new NotFound('Страница не найдена. Где вы взяли на неё ссылку?'));
 });
+app.use(errors());
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Слушаем порт: ${PORT}`);

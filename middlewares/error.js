@@ -14,6 +14,11 @@ class NewError extends Error {
 }
 
 const errorHandler = (err, req, res, next) => {
+  console.log(err);
+  if (err.name === 'Error') {
+    res.status(err.statusCode).send({ message: err.message });
+    next();
+  }
   let error;
   switch (String(err.name)) {
     case 'Not found':
@@ -34,7 +39,7 @@ const errorHandler = (err, req, res, next) => {
       error = new NewError(err, DEFAULT_ERR, 'Произошла ошибка на сервере');
     }
   }
-  res.status(error.statusCode).send({ message: error.message });
+  res.status(error.statusCode || 500).send({ message: error.message } || '');
   next();
 };
 
