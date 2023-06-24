@@ -50,11 +50,15 @@ module.exports.getCards = (req, res) => {
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  // eslint-disable-next-line no-underscore-dangle
-  if (!(req.user._id === Card.findById(req.params.cardId)._conditions._id)) {
-    throw new MissiedData('У карточки другой создатель');
-  }
+module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
+    .populate(['owner'])
+    .then((user) => {
+      if (user && !(req.user._id === user.owner._id)) {
+        throw new MissiedData('У карточки другой создатель');
+      }
+    })
+    .catch(next);
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => new Error('Not found'))
     .then((card) => res.send(card))
