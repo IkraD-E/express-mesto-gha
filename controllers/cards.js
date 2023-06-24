@@ -51,7 +51,7 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  if (!(req.user._id === Card.findById(req.user._id))) {
+  if (!(req.user._id === Card.findById(req.user._id)._conditions._id)) {
     throw new MissiedData('У карточки другой создатель');
   }
   Card.findByIdAndRemove(req.params.cardId)
