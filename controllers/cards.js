@@ -54,8 +54,8 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .populate(['owner'])
     .then((user) => {
-      if (user && !(req.user._id === user.owner._id)) {
-        throw new MissiedData('У карточки другой создатель');
+      if (user && !(req.user._id === String(user.owner._id))) {
+        throw new MissiedData(user.owner._id);
       } else {
         Card.findByIdAndRemove(req.params.cardId)
           .orFail(() => new Error('Not found'))
@@ -89,7 +89,6 @@ module.exports.deleteCard = (req, res, next) => {
       }
     })
     .catch(next);
-  
 };
 
 module.exports.addLike = (req, res) => {
