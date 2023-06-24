@@ -56,38 +56,40 @@ module.exports.deleteCard = (req, res, next) => {
     .then((user) => {
       if (user && !(req.user._id === user.owner._id)) {
         throw new MissiedData('У карточки другой создатель');
+      } else {
+        Card.findByIdAndRemove(req.params.cardId)
+          .orFail(() => new Error('Not found'))
+          .then((card) => res.send(card))
+          .catch((err) => {
+            if (err.message === 'Not found') {
+              res
+                .status(NOT_FOUND)
+                .send({
+                  message: 'Карточка не существует',
+                });
+              return;
+            }
+            if (err.name === 'CastError') {
+              res
+                .status(BAD_REQUEST_ERR)
+                .send({
+                  message: 'Карточка не найдена',
+                });
+            } else {
+              res.status(DEFAULT_ERR)
+                .send({
+                  message: 'Произошла ошибка на сервере',
+                });
+              console.log({
+                err: err.message,
+                stack: err.stack,
+              });
+            }
+          });
       }
     })
     .catch(next);
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail(() => new Error('Not found'))
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.message === 'Not found') {
-        res
-          .status(NOT_FOUND)
-          .send({
-            message: 'Карточка не существует',
-          });
-        return;
-      }
-      if (err.name === 'CastError') {
-        res
-          .status(BAD_REQUEST_ERR)
-          .send({
-            message: 'Карточка не найдена',
-          });
-      } else {
-        res.status(DEFAULT_ERR)
-          .send({
-            message: 'Произошла ошибка на сервере',
-          });
-        console.log({
-          err: err.message,
-          stack: err.stack,
-        });
-      }
-    });
+  
 };
 
 module.exports.addLike = (req, res) => {
