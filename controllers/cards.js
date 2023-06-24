@@ -51,7 +51,8 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  if (!(req.user._id === Card.findById(req.user._id)._conditions._id)) {
+  // eslint-disable-next-line no-underscore-dangle
+  if (!(req.user._id === Card.findById(req.params.cardId)._conditions._id)) {
     throw new MissiedData('У карточки другой создатель');
   }
   Card.findByIdAndRemove(req.params.cardId)
