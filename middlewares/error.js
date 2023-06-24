@@ -1,8 +1,9 @@
 const BAD_REQUEST_ERR = 400;
-const INCORRECT_DATA = 401;
+// const INCORRECT_DATA = 401;
 // const MISSED_DATA = 403;
 const NOT_FOUND = 404;
 const DEFAULT_ERR = 500;
+const EMAIL_ALREADY_IN_DB = 409;
 
 class NewError extends Error {
   constructor(err, statusCode, message) {
@@ -31,7 +32,7 @@ const errorHandler = (err, req, res, next) => {
       break;
     case 'MongoServerError':
       if (err.code === 11000) {
-        error = new NewError(err, INCORRECT_DATA, 'Пользователь с этой почтой уже зарегестрирован');
+        error = new NewError(err, EMAIL_ALREADY_IN_DB, 'Пользователь с этой почтой уже зарегестрирован');
       }
       break;
     default: {

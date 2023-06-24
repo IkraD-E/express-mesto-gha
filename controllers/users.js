@@ -25,6 +25,13 @@ module.exports.getUserById = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getUserMe = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail(() => new NotFound('Not found'))
+    .then((user) => res.send(user))
+    .catch(next);
+};
+
 module.exports.updateUserData = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, {
     name: req.body.name,

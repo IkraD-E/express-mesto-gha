@@ -7,11 +7,14 @@ const {
   getUserById,
   updateUserData,
   updateUserAvatar,
+  getUserMe,
 } = require('../controllers/users');
 
 router.use(auth);
 
 router.get('/', getUsers);
+
+router.get('/me', getUserMe);
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
@@ -28,8 +31,8 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().min(4),
-  }).unknown(true),
+    avatar: Joi.string().pattern(/https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]/),
+  }),
 }), updateUserAvatar);
 
 module.exports = router;
