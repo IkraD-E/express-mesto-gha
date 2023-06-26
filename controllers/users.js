@@ -1,11 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
 const NotFound = require('../errors/NotFound');
 const IncorrectData = require('../errors/IncorrectData');
-
-const INCORRECT_DATA = 401;
-const MISSED_DATA = 403;
+const UserDublication = require('../errors/UserDublication');
 
 const opts = {
   new: true,
@@ -13,51 +12,92 @@ const opts = {
 };
 
 module.exports.getUsers = (req, res, next) => {
-  User.find({})
+  User
+    .find({})
     .then((users) => res.status(200).send(users))
     .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
-    .orFail(() => new NotFound('Not found'))
+  User
+    .findById(req.params.userId)
+    .orFail(() => next(new NotFound('Пользователь не найден')))
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new IncorrectData('Передан некорректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  User.findById(req.user._id)
-    .orFail(() => new NotFound('Not found'))
+  User
+    .findById(req.user._id)
+    .orFail(() => next(new NotFound('Пользователь не найден')))
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new IncorrectData('Передан некорректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateUserData = (req, res, next) => {
-  User.findByIdAndUpdate(req.user._id, {
-    name: req.body.name,
-    about: req.body.about,
-  }, opts)
+  User
+    .findByIdAndUpdate(req.user._id, {
+      name: req.body.name,
+      about: req.body.about,
+    }, opts)
+    .orFail(() => next(new NotFound('Пользователь не найден')))
     .select('+password')
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new IncorrectData('Передан некорректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
-  User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, opts)
+  User
+    .findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, opts)
+    .orFail(() => next(new NotFound('Пользователь не найден')))
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new IncorrectData('Передан некорректный id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
-  bcrypt.hash(String(req.body.password), 10)
+  bcrypt
+    .hash(String(req.body.password), 10)
     .then(
       (hashedPassword) => {
-        User.create({
-          ...req.body,
-          password: hashedPassword,
-        })
+        User
+          .create({
+            ...req.body,
+            password: hashedPassword,
+          })
           .then((user) => res.status(201).send({ data: user }))
-          .catch((next));
+          .catch((err) => {
+            if (err.code === 11000) {
+              next(new UserDublication('Пользователь с этой почтой уже зарегестрирован'));
+            } else if (err.name === 'ValidationError') {
+              next(new IncorrectData('Переданы некорректные данные при регистрации'));
+            } else {
+              next(err);
+            }
+          });
       },
     )
     .catch((next));
@@ -66,18 +106,10 @@ module.exports.createUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    res
-      .status(MISSED_DATA)
-      .send({
-        message: 'введите логин и пароль',
-      });
-    return;
-  }
-
-  User.findOne({ email })
+  User
+    .findOne({ email })
     .select('+password')
-    .orFail(() => new IncorrectData('Пользователь не найден'))
+    .orFail(() => next(new IncorrectData('Пользователь не найден')))
     .then((user) => {
       bcrypt.compare(String(password), user.password)
         .then((isValidUser) => {
@@ -94,11 +126,7 @@ module.exports.login = (req, res, next) => {
             });
             res.send({ token });
           } else {
-            res
-              .status(INCORRECT_DATA)
-              .send({
-                message: 'Неправильный логин или пароль',
-              });
+            next(new IncorrectData('Неправильный логин или пароль'));
           }
         });
     })

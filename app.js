@@ -5,7 +5,7 @@ const { errors } = require('celebrate');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 const routerIndex = require('./routes/index');
-const errorHandler = require('./middlewares/error');
+const errorHandler = require('./middlewares/errorHandler');
 const NotFound = require('./errors/NotFound');
 
 const { PORT = 3000 } = process.env;
