@@ -1,9 +1,9 @@
 const errorHandler = (err, req, res, next) => {
-  const errMessage = err.message || 'На сервере произошла ошибка';
-
   const errStatus = err.statusCode || 500;
+  const errMessage = errStatus ? err.message || 'На сервере произошла ошибка';
 
-  res.status(errStatus || 500).send({ message: errMessage } || '');
+
+  res.status(errStatus).send({ message: errMessage } || '');
   next();
 };
 
