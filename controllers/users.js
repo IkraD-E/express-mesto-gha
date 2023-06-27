@@ -37,13 +37,7 @@ module.exports.getUserMe = (req, res, next) => {
     .findById(req.user._id)
     .orFail(() => next(new NotFound('Пользователь не найден')))
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new IncorrectData('Передан некорректный id'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports.updateUserData = (req, res, next) => {
@@ -56,8 +50,8 @@ module.exports.updateUserData = (req, res, next) => {
     .select('+password')
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new IncorrectData('Передан некорректный id'));
+      if (err.name === 'ValidationError') {
+        next(new IncorrectData('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -70,8 +64,8 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .orFail(() => next(new NotFound('Пользователь не найден')))
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new IncorrectData('Передан некорректный id'));
+      if (err.name === 'ValidationError') {
+        next(new IncorrectData('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -124,7 +118,7 @@ module.exports.login = (req, res, next) => {
               httpOnly: true,
               sameSite: true,
             });
-            res.send({ token });
+            res.send({ data: user.toJSON() });
           } else {
             next(new IncorrectData('Неправильный логин или пароль'));
           }

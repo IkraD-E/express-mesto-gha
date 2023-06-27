@@ -38,19 +38,16 @@ module.exports.deleteCard = (req, res, next) => {
       } else {
         Card.findByIdAndRemove(req.params.cardId)
           .then((deletedCard) => res.send(deletedCard))
-          .catch((err) => {
-            if (err.message === 'Not found') {
-              next(new NotFound('Карточка не найдена'));
-            }
-            if (err.name === 'CastError') {
-              next(new BadRequest('Некорректные данные карточки'));
-            } else {
-              next(err);
-            }
-          });
+          .catch(next);
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Некорректные данные карточки'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.addLike = (req, res, next) => {
@@ -60,13 +57,10 @@ module.exports.addLike = (req, res, next) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-    .orFail(() => new Error('Not found'))
+    .orFail(() => next(new NotFound('Карточка не найдена')))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.message === 'Not found') {
-        next(new NotFound('Карточка не найдена'));
-      }
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         next(new BadRequest('Некорректные данные карточки'));
       } else {
         next(err);
@@ -81,13 +75,10 @@ module.exports.deleteLike = (req, res, next) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-    .orFail(() => new Error('Not found'))
+    .orFail(() => next(new NotFound('Карточка не найдена')))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.message === 'Not found') {
-        next(new NotFound('Карточка не найдена'));
-      }
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         next(new BadRequest('Некорректные данные карточки'));
       } else {
         next(err);
