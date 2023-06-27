@@ -33,7 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(() => next(new NotFound('Карточка не найдена')))
     .populate(['owner'])
     .then((card) => {
-      if (req.user._id === String(card.owner._id)) {
+      if (!(req.user._id === String(card.owner._id))) {
         next(new MissiedData('Эта карточка принадлежит другому пользователю'));
       } else {
         Card.findByIdAndRemove(req.params.cardId)
