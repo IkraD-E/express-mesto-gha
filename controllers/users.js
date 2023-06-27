@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const NotFound = require('../errors/NotFound');
-const IncorrectData = require('../errors/IncorrectData');
+const AuthError = require('../errors/AuthError');
 const UserDublication = require('../errors/UserDublication');
 
 const opts = {
@@ -25,7 +25,7 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectData('Передан некорректный id'));
+        next(new AuthError('Передан некорректный id'));
       } else {
         next(err);
       }
@@ -51,7 +51,7 @@ module.exports.updateUserData = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectData('Переданы некорректные данные'));
+        next(new AuthError('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -65,7 +65,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectData('Переданы некорректные данные'));
+        next(new AuthError('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -87,7 +87,7 @@ module.exports.createUser = (req, res, next) => {
             if (err.code === 11000) {
               next(new UserDublication('Пользователь с этой почтой уже зарегестрирован'));
             } else if (err.name === 'ValidationError') {
-              next(new IncorrectData('Переданы некорректные данные при регистрации'));
+              next(new AuthError('Переданы некорректные данные при регистрации'));
             } else {
               next(err);
             }
@@ -103,7 +103,7 @@ module.exports.login = (req, res, next) => {
   User
     .findOne({ email })
     .select('+password')
-    .orFail(() => next(new IncorrectData('Пользователь не найден')))
+    .orFail(() => next(new AuthError('Пользователь не найден')))
     .then((user) => {
       bcrypt.compare(String(password), user.password)
         .then((isValidUser) => {
@@ -120,7 +120,7 @@ module.exports.login = (req, res, next) => {
             });
             res.send({ data: user.toJSON() });
           } else {
-            next(new IncorrectData('Неправильный логин или пароль'));
+            next(new AuthError('Неправильный логин или пароль'));
           }
         });
     })
