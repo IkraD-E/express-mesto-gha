@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const IncorrectData = require('../errors/IncorrectData');
+const AuthError = require('../errors/AuthError');
 
 // eslint-disable-next-line consistent-return
 const auth = (req, res, next) => {
   const authorization = req.cookies.jwt;
 
   if (!authorization) {
-    return next(new IncorrectData('Зайдите в ваш аккаунт'));
+    return next(new AuthError('Зайдите в ваш аккаунт'));
   }
 
   const token = authorization;
@@ -15,7 +15,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
-    return next(new IncorrectData('Получите новую куку'));
+    return next(new AuthError('Получите новую куку'));
   }
   req.user = payload;
 
