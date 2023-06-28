@@ -5,6 +5,7 @@ const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
 const AuthError = require('../errors/AuthError');
 const UserDublication = require('../errors/UserDublication');
+const BadRequest = require('../errors/BadRequest');
 
 const opts = {
   new: true,
@@ -25,7 +26,7 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new AuthError('Передан некорректный id'));
+        next(new BadRequest('Передан некорректный id'));
       } else {
         next(err);
       }
@@ -50,8 +51,8 @@ module.exports.updateUserData = (req, res, next) => {
     .select('+password')
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new AuthError('Переданы некорректные данные'));
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
       } else {
         next(err);
       }
