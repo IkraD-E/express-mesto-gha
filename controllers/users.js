@@ -66,7 +66,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new AuthError('Переданы некорректные данные'));
+        next(new BadRequest('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -88,7 +88,7 @@ module.exports.createUser = (req, res, next) => {
             if (err.code === 11000) {
               next(new UserDublication('Пользователь с этой почтой уже зарегестрирован'));
             } else if (err.name === 'ValidationError') {
-              next(new AuthError('Переданы некорректные данные при регистрации'));
+              next(new BadRequest('Переданы некорректные данные при регистрации'));
             } else {
               next(err);
             }
